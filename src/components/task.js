@@ -1,9 +1,16 @@
 import React from "react";
 import { Card } from "react-bootstrap";
-import { FaCheckCircle, FaEdit } from "react-icons/fa";
+import { FaCheckCircle, FaEdit, FaTrash } from "react-icons/fa";
 
 export default function Task(params) {
-  const { id = "", description = "", done = false, edit } = params;
+  const {
+    id = "",
+    description = "",
+    done = false,
+    edit,
+    approve,
+    remove,
+  } = params;
   return (
     <Card className="my-3">
       <Card.Body>
@@ -12,7 +19,10 @@ export default function Task(params) {
         <Card.Text>Estado: {done ? "Realizada" : "Pendiente"}</Card.Text>
         <div className="d-flex">
           <FaEdit className="icon" onClick={() => edit(id)} />
-          <FaCheckCircle className="icon" onClick={() => edit(id, true)} />
+          {!done ? (
+            <FaCheckCircle className="icon" onClick={() => approve(id, true)} />
+          ) : null}
+          <FaTrash className="icon" onClick={() => remove(id)} />
         </div>
       </Card.Body>
     </Card>

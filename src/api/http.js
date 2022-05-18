@@ -9,11 +9,11 @@ instance.interceptors.response.use(
     return response;
   },
   function (error) {
-    if (error.response.data.message) {
-      return Promise.reject(error.response.data.message);
+    if (error.response.data?.message) {
+      alert(error.response.data.message);
+    } else {
+      alert(error);
     }
-
-    return Promise.reject(error);
   }
 );
 

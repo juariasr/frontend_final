@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getListTasks, createTask, updateTask } from "../api/task";
+import { getListTasks, createTask, updateTask, deleteTask } from "../api/task";
 import Task from "../components/task";
 import { Modal, Button, Form } from "react-bootstrap";
 
@@ -19,7 +19,18 @@ export default function List() {
     setShow(true);
   }
 
+  async function completeTask(id) {
+    const tasks = data.filter((value) => value._id === id);
+    const dataActualizada = await updateTask({
+      id: tasks[0]._id,
+      description: tasks[0].description,
+      done: true,
+    });
+    modifyData(dataActualizada);
+  }
+
   function modifyData(call) {
+    debugger;
     let array = [...data];
     const item = array.findIndex((task) => {
       return task._id === call.data._id;
@@ -30,33 +41,33 @@ export default function List() {
   }
 
   async function GetTasks() {
-    getListTasks()
-      .then((data) => {
-        setData(data.data);
-      })
-      .catch((error) => {
-        alert(error);
-      });
+    const data = await getListTasks();
+    setData(data.data);
   }
 
   async function CreateOrUpdateTasks(event) {
     event.preventDefault();
     const { descripcion } = event.target.elements;
     if (id === 0) {
-      createTask({ description: descripcion.value })
-        .then((call) => setData([call.data, ...data]))
-        .catch((error) => {
-          alert(error);
-        });
+      const call = await createTask({ description: descripcion.value });
+      setData([call.data, ...data]);
     } else {
-      updateTask({ id: id, description: descripcion.value })
-        .then((call) => modifyData(call))
-        .catch((error) => {
-          alert(error);
-        });
+      const call = await updateTask({ id: id, description: descripcion.value });
+      modifyData(call);
     }
 
     setShow(false);
+  }
+
+  async function RemoveTask(id) {
+    debugger;
+    await deleteTask(id);
+    let array = [...data];
+    const index = array.findIndex().findIndex((task) => {
+      return task._id === id;
+    });
+
+    array.splice(index, 1);
   }
 
   useEffect(() => {
@@ -80,6 +91,8 @@ export default function List() {
             description={item.description}
             done={item.done}
             edit={openDialog}
+            approve={completeTask}
+            remove={RemoveTask}
           />
         );
       })}
