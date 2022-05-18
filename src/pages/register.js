@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Form, Button } from "react-bootstrap";
 import { registerApi } from "../api/user";
 import { useNavigate } from "react-router-dom";
