@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getListTasks, createTask } from "../api/task";
+import { getListTasks, createTask, updateTask } from "../api/task";
 import Task from "../components/task";
 import { Modal, Button, Form } from "react-bootstrap";
 
@@ -7,11 +7,26 @@ export default function List() {
   const [data, setData] = useState([]);
   const [show, setShow] = useState(false);
   const [id, setId] = useState(0);
+  const [description, setDescription] = useState("");
   const handleClose = () => setShow(false);
 
   function openDialog(id = 0) {
     setId(id);
+    if (id !== 0) {
+      const tasks = data.filter((value) => value._id === id);
+      setDescription(tasks[0].description);
+    }
     setShow(true);
+  }
+
+  function modifyData(call) {
+    let array = [...data];
+    const item = array.findIndex((task) => {
+      return task._id === call.data._id;
+    });
+
+    array[item] = call.data;
+    setData(array);
   }
 
   async function GetTasks() {
@@ -33,7 +48,15 @@ export default function List() {
         .catch((error) => {
           alert(error);
         });
+    } else {
+      updateTask({ id: id, description: descripcion.value })
+        .then((call) => modifyData(call))
+        .catch((error) => {
+          alert(error);
+        });
     }
+
+    setShow(false);
   }
 
   useEffect(() => {
@@ -56,6 +79,7 @@ export default function List() {
             id={item._id}
             description={item.description}
             done={item.done}
+            edit={openDialog}
           />
         );
       })}
@@ -67,7 +91,7 @@ export default function List() {
         keyboard={false}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Crear Tarea</Modal.Title>
+          <Modal.Title>{id === 0 ? "Crear Tarea" : "Editar Tarea"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={CreateOrUpdateTasks}>
@@ -77,12 +101,13 @@ export default function List() {
                 type="text"
                 name="descripcion"
                 placeholder="Descripcion"
+                defaultValue={description}
               />
             </Form.Group>
-            <Button variant="primary" type="submit">
-              Crear
+            <Button variant="primary" type="submit" className="icon">
+              {id === 0 ? "Crear" : "Editar"}
             </Button>
-            <Button variant="secondary" onClick={handleClose}>
+            <Button variant="secondary" onClick={handleClose} className="icon">
               Cerrar
             </Button>
           </Form>

@@ -16,3 +16,8 @@ code {
   margin-top: 20px;
 }
 
+.icon {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
